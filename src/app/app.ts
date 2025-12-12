@@ -55,4 +55,58 @@ export class App implements OnInit {
       throw error;
     }
   }
+
+  //-------------Creation--------------
+
+  protected newCategoryName = signal<string>('');
+  protected newCategoryDescription = signal<string>('');
+
+  //Formumuzdaki Kategori ismi input'u degiştigi zaman calısacak metodumuz
+  onNewCategoryNameChange(event: Event): void {
+    const value = (event.target as HTMLInputElement).value;
+    this.newCategoryName.set(value);
+  }
+
+  //Formumuzdaki Kategori acıklama input'u degiştiginde calısacak metodumuz
+  onNewCategoryDescriptionChange(event: Event): void {
+    const value = (event.target as HTMLInputElement).value;
+    this.newCategoryDescription.set(value); //signal degeri atanması
+  }
+
+  //Ekle butonuna basıldıgında form'umuzun submit olmasını istiyoruz
+  async addCategory(event: Event) {
+    //Form submit edildigi anda browser'in varsayılan davranısı sayfayı yenilemektir...
+    //Bunu engelliyoruz ki SPA davranısıyla devam edelim
+    event.preventDefault();
+
+    //Gönderilecek body'nin hazırlanması lazım...Bu , backEnd tarafımızın bekledigi modele karsılık gelmeli
+
+    const body = {
+      //Id backend tarafından olusturulacagı icin buraya vermiyoruz zaten modeleimiz de öyle bir property beklemiyor
+      categoryName: this.newCategoryName(),
+      description: this.newCategoryDescription(),
+    };
+
+    try {
+      //Bu noktada API'ya artık bir post istegi yapmamız lazım..Lakin burada dikkat etmemiz gereken nokta bize API nasıl bir response döndürecek...
+
+      const message = await lastValueFrom(
+        this.http.post('http://localhost:5004/api/Category', body, {
+          responseType: 'text', //bizim mevcut kullandıgımız API'da bize gelen cevap text haldedir...Eger bunu yapmazsanız sistem varsayılan olarak json deserialize etmeye calısır
+        })
+      );
+
+      console.log("API mesajı ",message);
+
+      //Basarılıysa signal value'umuzu tekrar set etmeliyiz...En dogrusu server'dan listeyi yeniden cekmek : 
+      this.categories.set(await this.getCategories());
+
+      //Form alanlarının resetlenmesi
+      this.newCategoryName.set('');
+      this.newCategoryDescription.set('');
+
+    } catch (error) {
+      console.log(error);
+    }
+  }
 }

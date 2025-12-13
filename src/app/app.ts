@@ -109,4 +109,20 @@ export class App implements OnInit {
       console.log(error);
     }
   }
+
+  async deleteCategory(categoryId: number) {
+    try {
+      const message = await lastValueFrom(
+        this.http.delete('http://localhost:5004/api/Category/softDelete', {
+          body: categoryId,
+          headers: { 'Content-Type': 'application/json' },
+          responseType: 'text'
+        })
+      );
+      console.log("API mesajı ", message);
+      this.categories.set(await this.getCategories());
+    } catch (error) {
+      console.log(error);
+    }
+  }
 }

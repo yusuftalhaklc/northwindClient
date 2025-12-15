@@ -267,6 +267,11 @@ export class App implements OnInit {
       );
 
       this.products.set(await this.getProducts());
+      this.newProductName.set('');
+      this.newProductDescription.set('');
+      this.newProductPrice.set(0);
+      this.newProductCategoryId.set(0);
+      
     } catch (error) {
       console.log(error);
     }
@@ -287,7 +292,7 @@ export class App implements OnInit {
 
 
 
-  
+
   async updateProduct(event: Event) {
     event.preventDefault();
 

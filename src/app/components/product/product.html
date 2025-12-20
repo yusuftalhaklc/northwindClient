@@ -1,0 +1,225 @@
+<div class="page">
+  <h1>Ürün Yönetimi</h1>
+
+  <!-- Hata -->
+  @if (errorMessage()) {
+    <div class="error">{{ errorMessage() }}</div>
+  }
+
+  <!-- Yükleniyor -->
+  @if (isLoading()) {
+    <div class="loading">Yükleniyor...</div>
+  }
+
+  <!-- Yeni Ürün Formu -->
+  <div class="section">
+    <h2>Yeni Ürün Ekle</h2>
+    <form (ngSubmit)="onAddProduct()">
+      <div class="form-row">
+        <div class="form-group">
+          <label>Ürün Adı:</label>
+          <input 
+            type="text" 
+            [(ngModel)]="newProduct().productName"
+            name="productName"
+            placeholder="Örn: iPhone 15"
+            required
+          />
+        </div>
+
+        <div class="form-group">
+          <label>Kategori:</label>
+          <select 
+            [(ngModel)]="newProduct().categoryId"
+            name="categoryId"
+            required
+          >
+            <option [value]="0">Kategori Seçin</option>
+            @for (category of categories(); track category.id) {
+              <option [value]="category.id">{{ category.categoryName }}</option>
+            }
+          </select>
+        </div>
+
+        <div class="form-group">
+          <label>Fiyat:</label>
+          <input 
+            type="number" 
+            [(ngModel)]="newProduct().price"
+            name="price"
+            placeholder="0.00"
+            step="0.01"
+            min="0"
+            required
+          />
+        </div>
+      </div>
+
+      <div class="form-group">
+        <label>Açıklama:</label>
+        <textarea 
+          [(ngModel)]="newProduct().description"
+          name="description"
+          placeholder="Ürün açıklaması..."
+          rows="3"
+        ></textarea>
+      </div>
+
+      <button type="submit" [disabled]="isLoading()">Ürün Ekle</button>
+    </form>
+  </div>
+
+  <!-- Filtreleme -->
+  <div class="section">
+    <h2>Filtrele</h2>
+    <div class="form-row">
+      <div class="form-group">
+        <label>Ara:</label>
+        <input 
+          type="text" 
+          [value]="searchTerm()"
+          (input)="onSearchChange($event)"
+          placeholder="Ürün adı veya açıklama..."
+        />
+      </div>
+
+      <div class="form-group">
+        <label>Kategori:</label>
+        <select 
+          [value]="selectedCategoryFilter()"
+          (change)="onCategoryFilterChange($event)"
+        >
+          <option [value]="0">Tüm Kategoriler</option>
+          @for (category of categories(); track category.id) {
+            <option [value]="category.id">{{ category.categoryName }}</option>
+          }
+        </select>
+      </div>
+
+      <div class="form-group">
+        <label>&nbsp;</label>
+        <button (click)="clearFilters()" [disabled]="isLoading()">Temizle</button>
+      </div>
+    </div>
+    <p><strong>{{ filteredProducts().length }}</strong> ürün gösteriliyor</p>
+  </div>
+
+  <!-- Ürün Listesi -->
+  <div class="section">
+    <h2>Ürünler</h2>
+
+    @if (filteredProducts().length === 0 && !isLoading()) {
+      <p>
+        @if (searchTerm() || selectedCategoryFilter() > 0) {
+          Arama kriterlerinize uygun ürün bulunamadı.
+        } @else {
+          Henüz ürün eklenmemiş.
+        }
+      </p>
+    }
+
+    <table>
+      <thead>
+        <tr>
+          <th>ID</th>
+          <th>Ürün Adı</th>
+          <th>Kategori</th>
+          <th>Fiyat</th>
+          <th>Açıklama</th>
+          <th>İşlemler</th>
+        </tr>
+      </thead>
+      <tbody>
+        @for (product of filteredProducts(); track product.id) {
+          <tr>
+            <!-- Normal Görünüm -->
+            @if (selectedProduct()?.id !== product.id) {
+              <td>{{ product.id }}</td>
+              <td>{{ product.productName }}</td>
+              <td>{{ getCategoryName(product.categoryId) }}</td>
+              <td>{{ formatPrice(product.price) }}</td>
+              <td>{{ product.description }}</td>
+              <td>
+                <button 
+                  (click)="viewProductDetail(product.id)" 
+                  class="btn-info"
+                  [disabled]="isLoading()"
+                >
+                  Detay
+                </button>
+                <button 
+                  (click)="onEditProduct(product)" 
+                  class="btn-edit"
+                  [disabled]="isLoading()"
+                >
+                  Düzenle
+                </button>
+                <button 
+                  (click)="onDeleteProduct(product)" 
+                  class="btn-delete"
+                  [disabled]="isLoading()"
+                >
+                  Sil
+                </button>
+              </td>
+            }
+
+            <!-- Düzenleme Modu -->
+            @if (selectedProduct()?.id === product.id) {
+              <td>{{ product.id }}</td>
+              <td>
+                <input 
+                  type="text" 
+                  [(ngModel)]="selectedProduct()!.productName"
+                  name="editProductName"
+                />
+              </td>
+              <td>
+                <select 
+                  [(ngModel)]="selectedProduct()!.categoryId"
+                  name="editCategoryId"
+                >
+                  @for (category of categories(); track category.id) {
+                    <option [value]="category.id">{{ category.categoryName }}</option>
+                  }
+                </select>
+              </td>
+              <td>
+                <input 
+                  type="number" 
+                  [(ngModel)]="selectedProduct()!.price"
+                  name="editPrice"
+                  step="0.01"
+                  min="0"
+                />
+              </td>
+              <td>
+                <input 
+                  type="text" 
+                  [(ngModel)]="selectedProduct()!.description"
+                  name="editDescription"
+                />
+              </td>
+              <td>
+                <button 
+                  (click)="onUpdateProduct()" 
+                  class="btn-save"
+                  [disabled]="isLoading()"
+                >
+                  Kaydet
+                </button>
+                <button 
+                  (click)="onCancelEdit()" 
+                  class="btn-cancel"
+                  [disabled]="isLoading()"
+                >
+                  İptal
+                </button>
+              </td>
+            }
+          </tr>
+        }
+      </tbody>
+    </table>
+  </div>
+</div>

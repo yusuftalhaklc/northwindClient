@@ -1,0 +1,75 @@
+.home {
+  padding: 20px 0;
+}
+
+h1 {
+  color: #333;
+  margin-bottom: 10px;
+}
+
+p {
+  color: #666;
+  margin-bottom: 30px;
+}
+
+/* Cards */
+.cards {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+  gap: 20px;
+  margin-bottom: 30px;
+}
+
+.card {
+  background: white;
+  padding: 20px;
+  border: 1px solid #ddd;
+  border-radius: 5px;
+}
+
+.card h2 {
+  color: #333;
+  margin-bottom: 10px;
+  font-size: 22px;
+}
+
+.card p {
+  color: #666;
+  margin-bottom: 15px;
+}
+
+/* Button */
+.button {
+  display: inline-block;
+  background-color: #007bff;
+  color: white;
+  padding: 10px 20px;
+  text-decoration: none;
+  border-radius: 3px;
+}
+
+.button:hover {
+  background-color: #0056b3;
+}
+
+/* Info */
+.info {
+  background: white;
+  padding: 20px;
+  border: 1px solid #ddd;
+  border-radius: 5px;
+}
+
+.info h3 {
+  color: #333;
+  margin-bottom: 15px;
+}
+
+.info ul {
+  padding-left: 20px;
+}
+
+.info li {
+  color: #666;
+  margin-bottom: 8px;
+}

@@ -1,0 +1,84 @@
+<div class="page">
+  <div class="top-buttons">
+    <button (click)="goBack()">← Geri</button>
+    <a routerLink="/products" class="button">Tüm Ürünler</a>
+  </div>
+
+  <!-- Hata -->
+  @if (errorMessage()) {
+    <div class="error">
+      {{ errorMessage() }}
+      <br><br>
+      <a routerLink="/products" class="button">Ürünler Sayfasına Dön</a>
+    </div>
+  }
+
+  <!-- Yükleniyor -->
+  @if (isLoading()) {
+    <div class="loading">Ürün bilgileri yükleniyor...</div>
+  }
+
+  <!-- Ürün Detayı -->
+  @if (product() && !isLoading()) {
+    <div class="section">
+      <h1>{{ product()!.productName }}</h1>
+      
+      @if (category()) {
+        <p class="category-label">
+          Kategori: <strong>{{ category()!.categoryName }}</strong> - {{ category()!.description }}
+        </p>
+      }
+
+      <p class="price">{{ formatPrice(product()!.price) }}</p>
+
+      <h3>Açıklama</h3>
+      <p>{{ product()!.description || 'Açıklama bulunmamaktadır.' }}</p>
+
+      <h3>Detaylar</h3>
+      <table class="details">
+        <tr>
+          <td>Ürün ID:</td>
+          <td><strong>{{ product()!.id }}</strong></td>
+        </tr>
+        <tr>
+          <td>Ürün Adı:</td>
+          <td><strong>{{ product()!.productName }}</strong></td>
+        </tr>
+        <tr>
+          <td>Kategori:</td>
+          <td><strong>{{ category()?.categoryName || 'Bilinmiyor' }}</strong></td>
+        </tr>
+        <tr>
+          <td>Fiyat:</td>
+          <td><strong>{{ formatPrice(product()!.price) }}</strong></td>
+        </tr>
+        <tr>
+          <td>Kategori ID:</td>
+          <td><strong>{{ product()!.categoryId }}</strong></td>
+        </tr>
+      </table>
+
+      <div class="actions">
+        <button (click)="editProduct()" [disabled]="isLoading()">Düzenle</button>
+        <button (click)="deleteProduct()" class="btn-delete" [disabled]="isLoading()">Sil</button>
+      </div>
+    </div>
+
+    <!-- İlgili Ürünler -->
+    @if (relatedProducts().length > 0) {
+      <div class="section">
+        <h2>Aynı Kategorideki Diğer Ürünler</h2>
+        
+        <div class="related-grid">
+          @for (related of relatedProducts(); track related.id) {
+            <div class="related-card" (click)="viewProduct(related.id)">
+              <h3>{{ related.productName }}</h3>
+              <p>{{ formatPrice(related.price) }}</p>
+              <button class="btn-info">Detayları Gör</button>
+            </div>
+          }
+        </div>
+      </div>
+    }
+  }
+</div>

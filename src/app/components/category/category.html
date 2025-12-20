@@ -1,0 +1,125 @@
+<div class="page">
+  <h1>Kategori Yönetimi</h1>
+
+  <!-- Hata -->
+  @if (errorMessage()) {
+    <div class="error">{{ errorMessage() }}</div>
+  }
+
+  <!-- Yükleniyor -->
+  @if (isLoading()) {
+    <div class="loading">Yükleniyor...</div>
+  }
+
+  <!-- Yeni Kategori Formu -->
+  <div class="section">
+    <h2>Yeni Kategori Ekle</h2>
+    <form (ngSubmit)="onAddCategory()">
+      <div class="form-group">
+        <label>Kategori Adı:</label>
+        <input 
+          type="text" 
+          [(ngModel)]="newCategory().categoryName"
+          name="categoryName"
+          placeholder="Örn: Elektronik"
+          required
+        />
+      </div>
+
+      <div class="form-group">
+        <label>Açıklama:</label>
+        <textarea 
+          [(ngModel)]="newCategory().description"
+          name="description"
+          placeholder="Kategori açıklaması..."
+          rows="3"
+        ></textarea>
+      </div>
+
+      <button type="submit" [disabled]="isLoading()">Kategori Ekle</button>
+    </form>
+  </div>
+
+  <!-- Kategori Listesi -->
+  <div class="section">
+    <h2>Kategoriler ({{ categories().length }})</h2>
+
+    @if (categories().length === 0 && !isLoading()) {
+      <p>Henüz kategori eklenmemiş.</p>
+    }
+
+    <table>
+      <thead>
+        <tr>
+          <th>ID</th>
+          <th>Kategori Adı</th>
+          <th>Açıklama</th>
+          <th>İşlemler</th>
+        </tr>
+      </thead>
+      <tbody>
+        @for (category of categories(); track category.id) {
+          <tr>
+            <!-- Normal Görünüm -->
+            @if (selectedCategory()?.id !== category.id) {
+              <td>{{ category.id }}</td>
+              <td>{{ category.categoryName }}</td>
+              <td>{{ category.description }}</td>
+              <td>
+                <button 
+                  (click)="onEditCategory(category)" 
+                  class="btn-edit"
+                  [disabled]="isLoading()"
+                >
+                  Düzenle
+                </button>
+                <button 
+                  (click)="onDeleteCategory(category)" 
+                  class="btn-delete"
+                  [disabled]="isLoading()"
+                >
+                  Sil
+                </button>
+              </td>
+            }
+
+            <!-- Düzenleme Modu -->
+            @if (selectedCategory()?.id === category.id) {
+              <td>{{ category.id }}</td>
+              <td>
+                <input 
+                  type="text" 
+                  [(ngModel)]="selectedCategory()!.categoryName"
+                  name="editName"
+                />
+              </td>
+              <td>
+                <input 
+                  type="text" 
+                  [(ngModel)]="selectedCategory()!.description"
+                  name="editDescription"
+                />
+              </td>
+              <td>
+                <button 
+                  (click)="onUpdateCategory()" 
+                  class="btn-save"
+                  [disabled]="isLoading()"
+                >
+                  Kaydet
+                </button>
+                <button 
+                  (click)="onCancelEdit()" 
+                  class="btn-cancel"
+                  [disabled]="isLoading()"
+                >
+                  İptal
+                </button>
+              </td>
+            }
+          </tr>
+        }
+      </tbody>
+    </table>
+  </div>
+</div>
